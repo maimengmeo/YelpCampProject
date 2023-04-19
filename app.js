@@ -31,14 +31,19 @@ app.get("/", (req, res) => {
     res.render("home");
 });
 
-app.get("/makeCampground", async (req, res) => {
-    const camp = new Campground({
-        title: "My Backyard",
-        description: "cheap camping",
-    });
-    await camp.save();
-    res.send(camp);
+app.get("/campgrounds", async (req, res) => {
+    const campgrounds = await Campground.find({});
+    res.render("campgrounds/index", { campgrounds });
 });
+
+// app.get("/makeCampground", async (req, res) => {
+//     const camp = new Campground({
+//         title: "My Backyard",
+//         description: "cheap camping",
+//     });
+//     await camp.save();
+//     res.send(camp);
+// });
 
 app.listen(3000, () => {
     console.log("serving on port 3000");
