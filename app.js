@@ -3,6 +3,7 @@ const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
 const Campground = require("./models/campground");
+const override = require("method-override"); //use to update, delete
 
 //get mongoose model setup====================================
 mongoose
@@ -30,7 +31,10 @@ app.set("views", path.join(__dirname, "views"));
 
 //tell express to pass the body
 app.use(express.urlencoded({ extedned: true }));
-//=================================================================
+
+app.use(override("_method"));
+
+//order is matter=================================================================
 app.get("/", (req, res) => {
     res.render("home");
 });
@@ -57,14 +61,27 @@ app.get("/campgrounds/:id", async (req, res) => {
     //get the id from index.ejs, find campground by id, put it to show.ejs
 });
 
-// app.get("/makeCampground", async (req, res) => {
-//     const camp = new Campground({
-//         title: "My Backyard",
-//         description: "cheap camping",
-//     });
-//     await camp.save();
-//     res.send(camp);
-// });
+app.get("/campgrounds/:id/edit", async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    res.render("campgrounds/edit", { campground });
+
+    //get the selected to edit campground from id from url, inject it to edit page
+});
+
+//app.put is used to update resource at the spec path
+app.put("/campgrounds/:id", async (req, res) => {
+    const { id } = req.params;
+    const campground = await Campground.findByIdAndUpdate(id, {
+        ...req.body.campground,
+    });
+    res.redirect(`/campgrounds/${campground.id}`);
+});
+
+app.delete("/campgrounds/:id", async (req, res) => {
+    const { id } = req.params;
+    await Campground.findByIdAndDelete(id);
+    res.redirect("/campgrounds");
+});
 
 //===================================================================
 app.listen(3000, () => {
