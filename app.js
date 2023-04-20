@@ -39,21 +39,25 @@ app.get("/", (req, res) => {
     res.render("home");
 });
 
+//display all campgrounds
 app.get("/campgrounds", async (req, res) => {
     const campgrounds = await Campground.find({});
     res.render("campgrounds/index", { campgrounds });
 });
 
+//go to create campground page
 app.get("/campgrounds/new", (req, res) => {
     res.render("campgrounds/new");
 });
 
+//create campground
 app.post("/campgrounds", async (req, res) => {
     const campground = new Campground(req.body.campground); //create new campground from req.body
     await campground.save();
     res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
 });
 
+//go to selected campground page
 app.get("/campgrounds/:id", async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     res.render("campgrounds/show", { campground });
@@ -61,6 +65,7 @@ app.get("/campgrounds/:id", async (req, res) => {
     //get the id from index.ejs, find campground by id, put it to show.ejs
 });
 
+//go to edit page
 app.get("/campgrounds/:id/edit", async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     res.render("campgrounds/edit", { campground });
@@ -70,11 +75,15 @@ app.get("/campgrounds/:id/edit", async (req, res) => {
 
 //app.put is used to update resource at the spec path
 app.put("/campgrounds/:id", async (req, res) => {
+    //obj destructuring, extract id
     const { id } = req.params;
     const campground = await Campground.findByIdAndUpdate(id, {
         ...req.body.campground,
+        //need to use spread obj here bc this method takes an obj w new data
+        //need to spread the obj into obj literal to create new obj
+        //that contain all original properties along w new data submitted
     });
-    res.redirect(`/campgrounds/${campground.id}`);
+    res.redirect(`/campgrounds/${campground._id}`);
 });
 
 app.delete("/campgrounds/:id", async (req, res) => {
