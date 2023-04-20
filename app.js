@@ -4,6 +4,7 @@ const path = require("path");
 const mongoose = require("mongoose");
 const Campground = require("./models/campground");
 const override = require("method-override"); //use to update, delete
+const ejsMate = require("ejs-mate"); //npm i ejs-mate first
 
 //get mongoose model setup====================================
 mongoose
@@ -25,11 +26,12 @@ db.once("open", () => {
     console.log("Database connected");
 });
 
-//===============================================================
+//middleware set up===============================================================
+app.engine("ejs", ejsMate); //tell express we want ejsMate, not the default one
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-//tell express to pass the body
+//tell express to pass the body/ to use req.body
 app.use(express.urlencoded({ extedned: true }));
 
 app.use(override("_method"));
