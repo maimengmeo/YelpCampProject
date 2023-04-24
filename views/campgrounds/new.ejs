@@ -3,7 +3,12 @@
 <div class="row">
     <h1 class="text-center">New Campground</h1>
     <div class="col-6 offset-3">
-        <form action="/campgrounds" method="POST">
+        <form
+            action="/campgrounds"
+            method="POST"
+            novalidate
+            class="validated-form"
+        >
             <div class="mb-3">
                 <label class="form-label" for="title">Title</label>
                 <input
@@ -11,6 +16,7 @@
                     type="text"
                     id="title"
                     name="campground[title]"
+                    required
                 />
             </div>
 
@@ -21,6 +27,7 @@
                     type="text"
                     id="location"
                     name="campground[location]"
+                    required
                 />
             </div>
 
@@ -31,7 +38,7 @@
                     type="text"
                     id="location"
                     name="campground[image]"
-                    value=""
+                    required
                 />
             </div>
 
@@ -47,6 +54,7 @@
                         aria-label="price"
                         aria-describedby="price-label"
                         name="campground[price]"
+                        required
                     />
                 </div>
             </div>
@@ -58,7 +66,7 @@
                     type="text"
                     id="description"
                     name="campground[description]"
-                    value=""
+                    required
                 ></textarea>
             </div>
 
@@ -72,3 +80,28 @@
         </form>
     </div>
 </div>
+
+<script>
+    (() => {
+        "use strict";
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll(".validated-form");
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach((form) => {
+            form.addEventListener(
+                "submit",
+                (event) => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add("was-validated");
+                },
+                false
+            );
+        });
+    })();
+</script>
