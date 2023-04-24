@@ -6,6 +6,7 @@ const Campground = require("./models/campground");
 const override = require("method-override"); //use to update, delete
 const ejsMate = require("ejs-mate"); //npm i ejs-mate first
 const catchAsync = require("./utils/catchAsync");
+const ExpressError = require("./utils/ExpressError");
 
 //get mongoose model setup====================================
 mongoose
@@ -33,7 +34,7 @@ app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
 //tell express to pass the body/ to use req.body
-app.use(express.urlencoded({ extedned: true }));
+app.use(express.urlencoded({ extened: true }));
 
 app.use(override("_method"));
 
@@ -60,6 +61,8 @@ app.get("/campgrounds/new", (req, res) => {
 app.post(
     "/campgrounds",
     catchAsync(async (req, res, next) => {
+        if (!req.body.campground)
+            throw new ExpressError("Invalid Campground Data", 400);
         const campground = new Campground(req.body.campground); //create new campground from req.body
         await campground.save();
         res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
@@ -114,8 +117,15 @@ app.delete(
 );
 
 //error handler===========================================================
+//order is matter, if it doesnt match any one above, it will go to here
+app.all("*", (req, res, next) => {
+    next(new ExpressError("Page Not Found", 404));
+});
+
 app.use((err, req, res, next) => {
-    res.send("Something went wrong!");
+    const { statusCode = 500 } = err;
+    if (!err.message) err.message = "Something went wrong";
+    res.status(statusCode).render("error", { err });
 });
 //===================================================================
 app.listen(3000, () => {
