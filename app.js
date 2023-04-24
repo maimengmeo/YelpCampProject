@@ -53,10 +53,14 @@ app.get("/campgrounds/new", (req, res) => {
 });
 
 //create campground
-app.post("/campgrounds", async (req, res) => {
-    const campground = new Campground(req.body.campground); //create new campground from req.body
-    await campground.save();
-    res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
+app.post("/campgrounds", async (req, res, next) => {
+    try {
+        const campground = new Campground(req.body.campground); //create new campground from req.body
+        await campground.save();
+        res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
+    } catch (err) {
+        next(err);
+    }
 });
 
 //go to selected campground page
@@ -94,6 +98,10 @@ app.delete("/campgrounds/:id", async (req, res) => {
     res.redirect("/campgrounds");
 });
 
+//error handler===========================================================
+app.use((err, req, res, next) => {
+    res.send("Something went wrong!");
+});
 //===================================================================
 app.listen(3000, () => {
     console.log("serving on port 3000");
