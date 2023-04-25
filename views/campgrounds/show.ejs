@@ -36,7 +36,11 @@
             <div class="card-footer">Updated 2 days ago</div>
         </div>
         <h2>Leave a Review</h2>
-        <form action="" class="mb-3">
+        <form
+            action="/campgrounds/<%= campground._id%>/reviews"
+            class="mb-3"
+            method="POST"
+        >
             <div class="mb-3">
                 <label class="form-label" for="rating">Rating</label>
                 <input

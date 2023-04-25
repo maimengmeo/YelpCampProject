@@ -8,7 +8,7 @@ const ejsMate = require("ejs-mate"); //npm i ejs-mate first
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
 const { campgroundSchema } = require("./errorSchemas");
-
+const Review = require("./models/review");
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
@@ -129,6 +129,15 @@ app.delete(
         res.redirect("/campgrounds");
     })
 );
+
+app.post("/campgrounds/:id/reviews", async (req, res) => {
+    const campground = await Campground.findById(req.params.id);
+    const review = new Review(req.body.review);
+    campground.reviews.push(review);
+    await review.save();
+    await campground.save();
+    res.redirect(`/campgrounds/${campground._id}`);
+});
 
 //error handler===========================================================
 //order is matter, if it doesnt match any one above, it will go to here
