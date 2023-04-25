@@ -7,6 +7,7 @@ const override = require("method-override"); //use to update, delete
 const ejsMate = require("ejs-mate"); //npm i ejs-mate first
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
+const { campgroundSchema } = require("./errorSchemas");
 
 //get mongoose model setup====================================
 mongoose
@@ -38,6 +39,17 @@ app.use(express.urlencoded({ extened: true }));
 
 app.use(override("_method"));
 
+const validateCampground = (req, res, next) => {
+    //get the error, loop through details array, map => array, join message with
+    const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(msg, 400);
+    } else {
+        next(); //is no error, go to post/ put function
+    }
+};
+
 //order is matter=================================================================
 app.get("/", (req, res) => {
     res.render("home");
@@ -60,9 +72,10 @@ app.get("/campgrounds/new", (req, res) => {
 //create campground
 app.post(
     "/campgrounds",
+    validateCampground,
     catchAsync(async (req, res, next) => {
-        if (!req.body.campground)
-            throw new ExpressError("Invalid Campground Data", 400);
+        //if (!req.body.campground) throw new ExpressError("Invalid Campground Data", 400);
+
         const campground = new Campground(req.body.campground); //create new campground from req.body
         await campground.save();
         res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
@@ -94,6 +107,7 @@ app.get(
 //app.put is used to update resource at the spec path
 app.put(
     "/campgrounds/:id",
+    validateCampground,
     catchAsync(async (req, res) => {
         //obj destructuring, extract id
         const { id } = req.params;
