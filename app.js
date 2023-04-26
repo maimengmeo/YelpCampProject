@@ -7,7 +7,7 @@ const Campground = require("./models/campground");
 const Review = require("./models/review");
 
 const override = require("method-override"); //use to update, delete
-const ejsMate = require("ejs-mate"); //npm i ejs-mate first
+const ejsMate = require("ejs-mate"); //npm i ejs-mate first, allow inject content
 
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
@@ -37,6 +37,7 @@ db.once("open", () => {
 
 //middleware set up===============================================================
 app.engine("ejs", ejsMate); //tell express we want ejsMate, not the default one
+
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
@@ -44,6 +45,8 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extened: true }));
 
 app.use(override("_method"));
+
+app.use(express.static(path.join(__dirname, "public")));
 
 //order is matter=================================================================
 app.use("/campgrounds", campgroundRoutes);
