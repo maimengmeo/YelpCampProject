@@ -153,6 +153,20 @@ app.post("/campgrounds/:id/reviews", validateReview, async (req, res) => {
     res.redirect(`/campgrounds/${campground._id}`);
 });
 
+app.delete(
+    "/campgrounds/:id/reviews/:reviewId",
+    catchAsync(async (req, res) => {
+        const { id, reviewId } = req.params;
+
+        await Campground.findByIdAndUpdate(id, {
+            $pull: { reviews: reviewId },
+        });
+        await Review.findById(req.params.reviewId);
+
+        res.redirect(`/campgrounds/${id}`);
+    })
+);
+
 //error handler===========================================================
 //order is matter, if it doesnt match any one above, it will go to here
 app.all("*", (req, res, next) => {
