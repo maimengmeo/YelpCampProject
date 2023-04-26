@@ -7,7 +7,7 @@ const override = require("method-override"); //use to update, delete
 const ejsMate = require("ejs-mate"); //npm i ejs-mate first
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
-const { campgroundSchema } = require("./errorSchemas");
+const { campgroundSchema, reviewSchema } = require("./errorSchemas");
 const Review = require("./models/review");
 //get mongoose model setup====================================
 mongoose
@@ -42,6 +42,16 @@ app.use(override("_method"));
 const validateCampground = (req, res, next) => {
     //get the error, loop through details array, map => array, join message with
     const { error } = campgroundSchema.validate(req.body);
+    if (error) {
+        const msg = error.details.map((el) => el.message).join(",");
+        throw new ExpressError(msg, 400);
+    } else {
+        next(); //is no error, go to post/ put function
+    }
+};
+
+const validateReview = (req, res, next) => {
+    const { error } = reviewSchema.validate(req.body);
     if (error) {
         const msg = error.details.map((el) => el.message).join(",");
         throw new ExpressError(msg, 400);
@@ -130,12 +140,14 @@ app.delete(
     })
 );
 
-app.post("/campgrounds/:id/reviews", async (req, res) => {
+app.post("/campgrounds/:id/reviews", validateReview, async (req, res) => {
     const campground = await Campground.findById(req.params.id);
     const review = new Review(req.body.review);
+
     campground.reviews.push(review);
     await review.save();
     await campground.save();
+
     res.redirect(`/campgrounds/${campground._id}`);
 });
 
