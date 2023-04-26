@@ -2,13 +2,19 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
+
 const Campground = require("./models/campground");
+const Review = require("./models/review");
+
 const override = require("method-override"); //use to update, delete
 const ejsMate = require("ejs-mate"); //npm i ejs-mate first
+
 const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
 const { campgroundSchema, reviewSchema } = require("./errorSchemas");
-const Review = require("./models/review");
+
+const campgroundRoutes = require("./routes/campgrounds");
+
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
@@ -39,17 +45,6 @@ app.use(express.urlencoded({ extened: true }));
 
 app.use(override("_method"));
 
-const validateCampground = (req, res, next) => {
-    //get the error, loop through details array, map => array, join message with
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(msg, 400);
-    } else {
-        next(); //is no error, go to post/ put function
-    }
-};
-
 const validateReview = (req, res, next) => {
     const { error } = reviewSchema.validate(req.body);
     if (error) {
@@ -61,86 +56,11 @@ const validateReview = (req, res, next) => {
 };
 
 //order is matter=================================================================
+app.use("/campgrounds", campgroundRoutes);
+
 app.get("/", (req, res) => {
     res.render("home");
 });
-
-//display all campgrounds
-app.get(
-    "/campgrounds",
-    catchAsync(async (req, res) => {
-        const campgrounds = await Campground.find({});
-        res.render("campgrounds/index", { campgrounds });
-    })
-);
-
-//go to create campground page
-app.get("/campgrounds/new", (req, res) => {
-    res.render("campgrounds/new");
-});
-
-//create campground
-app.post(
-    "/campgrounds",
-    validateCampground,
-    catchAsync(async (req, res, next) => {
-        //if (!req.body.campground) throw new ExpressError("Invalid Campground Data", 400);
-
-        const campground = new Campground(req.body.campground); //create new campground from req.body
-        await campground.save();
-        res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
-    })
-);
-
-//go to selected campground page
-app.get(
-    "/campgrounds/:id",
-    catchAsync(async (req, res) => {
-        const campground = await Campground.findById(req.params.id).populate(
-            "reviews"
-        );
-        res.render("campgrounds/show", { campground });
-
-        //get the id from index.ejs, find campground by id, put it to show.ejs
-    })
-);
-
-//go to edit page
-app.get(
-    "/campgrounds/:id/edit",
-    catchAsync(async (req, res) => {
-        const campground = await Campground.findById(req.params.id);
-        res.render("campgrounds/edit", { campground });
-
-        //get the selected to edit campground from id from url, inject it to edit page
-    })
-);
-
-//app.put is used to update resource at the spec path
-app.put(
-    "/campgrounds/:id",
-    validateCampground,
-    catchAsync(async (req, res) => {
-        //obj destructuring, extract id
-        const { id } = req.params;
-        const campground = await Campground.findByIdAndUpdate(id, {
-            ...req.body.campground,
-            //need to use spread obj here bc this method takes an obj w new data
-            //need to spread the obj into obj literal to create new obj
-            //that contain all original properties along w new data submitted
-        });
-        res.redirect(`/campgrounds/${campground._id}`);
-    })
-);
-
-app.delete(
-    "/campgrounds/:id",
-    catchAsync(async (req, res) => {
-        const { id } = req.params;
-        await Campground.findByIdAndDelete(id);
-        res.redirect("/campgrounds");
-    })
-);
 
 app.post("/campgrounds/:id/reviews", validateReview, async (req, res) => {
     const campground = await Campground.findById(req.params.id);
