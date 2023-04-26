@@ -2,9 +2,8 @@ const express = require("express");
 const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
-
-//const Campground = require("./models/campground");
-//const Review = require("./models/review");
+const passport = require("passport");
+const LocalStrategy = require("passport-local");
 
 const override = require("method-override"); //use to update, delete
 const ejsMate = require("ejs-mate"); //npm i ejs-mate first, allow inject content
@@ -18,6 +17,7 @@ const ExpressError = require("./utils/ExpressError");
 const campgroundRoutes = require("./routes/campgroundRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 
+const User = require("./models/user");
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
@@ -69,6 +69,15 @@ app.use((req, res, next) => {
     res.locals.error = req.flash("error");
     next();
 });
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate())); //static method comes along with package
+
+//how to store & unstore user in the session
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 //order is matter=================================================================
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds", reviewRoutes);
