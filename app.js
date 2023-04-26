@@ -13,8 +13,8 @@ const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
 const { campgroundSchema, reviewSchema } = require("./errorSchemas");
 
-const campgroundRoutes = require("./routes/campgrounds");
-
+const campgroundRoutes = require("./routes/campgroundRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
@@ -45,47 +45,13 @@ app.use(express.urlencoded({ extened: true }));
 
 app.use(override("_method"));
 
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(msg, 400);
-    } else {
-        next(); //is no error, go to post/ put function
-    }
-};
-
 //order is matter=================================================================
 app.use("/campgrounds", campgroundRoutes);
+app.use("/campgrounds", reviewRoutes);
 
 app.get("/", (req, res) => {
     res.render("home");
 });
-
-app.post("/campgrounds/:id/reviews", validateReview, async (req, res) => {
-    const campground = await Campground.findById(req.params.id);
-    const review = new Review(req.body.review);
-
-    campground.reviews.push(review);
-    await review.save();
-    await campground.save();
-
-    res.redirect(`/campgrounds/${campground._id}`);
-});
-
-app.delete(
-    "/campgrounds/:id/reviews/:reviewId",
-    catchAsync(async (req, res) => {
-        const { id, reviewId } = req.params;
-
-        await Campground.findByIdAndUpdate(id, {
-            $pull: { reviews: reviewId },
-        });
-        await Review.findById(req.params.reviewId);
-
-        res.redirect(`/campgrounds/${id}`);
-    })
-);
 
 //error handler===========================================================
 //order is matter, if it doesnt match any one above, it will go to here
