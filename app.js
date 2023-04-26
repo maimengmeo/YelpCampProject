@@ -96,7 +96,9 @@ app.post(
 app.get(
     "/campgrounds/:id",
     catchAsync(async (req, res) => {
-        const campground = await Campground.findById(req.params.id);
+        const campground = await Campground.findById(req.params.id).populate(
+            "reviews"
+        );
         res.render("campgrounds/show", { campground });
 
         //get the id from index.ejs, find campground by id, put it to show.ejs
