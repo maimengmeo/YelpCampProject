@@ -3,18 +3,20 @@ const app = express();
 const path = require("path");
 const mongoose = require("mongoose");
 
-const Campground = require("./models/campground");
-const Review = require("./models/review");
+//const Campground = require("./models/campground");
+//const Review = require("./models/review");
 
 const override = require("method-override"); //use to update, delete
 const ejsMate = require("ejs-mate"); //npm i ejs-mate first, allow inject content
+const session = require("express-session");
 
-const catchAsync = require("./utils/catchAsync");
+//const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
-const { campgroundSchema, reviewSchema } = require("./errorSchemas");
+//const { campgroundSchema, reviewSchema } = require("./errorSchemas");
 
 const campgroundRoutes = require("./routes/campgroundRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
@@ -48,6 +50,17 @@ app.use(override("_method"));
 
 app.use(express.static(path.join(__dirname, "public")));
 
+const sessionConfig = {
+    secret: "thisshouldbeabettersecret",
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000 * 60 * 60 * 24 * 7, //1 week
+        maxAge: 1000 * 60 * 60 * 24 * 7,
+    },
+};
+app.use(session(sessionConfig));
 //order is matter=================================================================
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds", reviewRoutes);
