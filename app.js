@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const override = require("method-override"); //use to update, delete
 const ejsMate = require("ejs-mate"); //npm i ejs-mate first, allow inject content
 const session = require("express-session");
+const flash = require("connect-flash"); //store & display flash message, work along with session
 
 //const catchAsync = require("./utils/catchAsync");
 const ExpressError = require("./utils/ExpressError");
@@ -61,6 +62,13 @@ const sessionConfig = {
     },
 };
 app.use(session(sessionConfig));
+
+app.use(flash());
+app.use((req, res, next) => {
+    res.locals.success = req.flash("success");
+    res.locals.error = req.flash("error");
+    next();
+});
 //order is matter=================================================================
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds", reviewRoutes);

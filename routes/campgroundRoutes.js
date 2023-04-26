@@ -38,6 +38,8 @@ router.post(
     "/",
     validateCampground,
     catchAsync(async (req, res, next) => {
+        req.flash("success", "Successfully add a new campground!");
+
         //if (!req.body.campground) throw new ExpressError("Invalid Campground Data", 400);
 
         const campground = new Campground(req.body.campground); //create new campground from req.body
