@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const campgroundController = require("../controllers/campgroundcontroller");
 const catchAsync = require("../utils/catchAsync");
-const Campground = require("../models/campground");
 
 const {
     isLoggedIn,
