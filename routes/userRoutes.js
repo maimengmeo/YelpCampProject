@@ -4,6 +4,7 @@ const User = require("../models/user");
 const catchAsync = require("../utils/catchAsync");
 const passport = require("passport");
 const { render } = require("ejs");
+const { storeReturnTo } = require("../middleware");
 
 router.get("/register", (req, res) => {
     res.render("users/register");
@@ -35,16 +36,18 @@ router.get("/login", (req, res) => {
     res.render("users/login");
 });
 
-//authenticate user before login, if fail, display flash message and redirect to login page
 router.post(
     "/login",
+    storeReturnTo, //to save the returnTo value from session to res.locals
     passport.authenticate("local", {
+        //authenticate user before login, if fail, display flash message and redirect to login page
         failureFlash: true,
         failureRedirect: "/login",
     }),
     (req, res) => {
         req.flash("success", "Welcome back!");
-        res.redirect("/campgrounds");
+        const redirectUrl = res.locals.returnTo || "/campgrounds"; // redirect user to the previous page
+        res.redirect(redirectUrl);
     }
 );
 
