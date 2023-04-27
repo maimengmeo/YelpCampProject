@@ -11,26 +11,35 @@ const {
 } = require("../middleware");
 
 //path - order is matter========================================
-//display all campgrounds
-router.get("/", catchAsync(campgroundController.index));
+
+router
+    .route("/")
+    .get(catchAsync(campgroundController.index)) //display all campgrounds
+    .post(
+        //create campground
+        validateCampground,
+        isLoggedIn,
+        catchAsync(campgroundController.createCampground)
+    );
 
 //go to create campground page
 router.get("/new", isLoggedIn, campgroundController.newCampgroundForm);
 
-//create campground
-router.post(
-    "/",
-    validateCampground,
-    isLoggedIn,
-    catchAsync(campgroundController.createCampground)
-);
-
-//go to selected campground page
-router.get(
-    "/:id",
-    storeReturnTo,
-    catchAsync(campgroundController.showCampground)
-);
+router
+    .route("/:id")
+    .get(storeReturnTo, catchAsync(campgroundController.showCampground)) //go to selected campground page
+    .put(
+        //app.put is used to update resource at the spec path
+        validateCampground,
+        isLoggedIn,
+        isAuthor,
+        catchAsync(campgroundController.updateCampground)
+    )
+    .delete(
+        isLoggedIn,
+        isAuthor,
+        catchAsync(campgroundController.deleteCampground)
+    );
 
 //go to edit page
 router.get(
@@ -38,22 +47,6 @@ router.get(
     isLoggedIn,
     isAuthor,
     catchAsync(campgroundController.editCampgroundForm)
-);
-
-//app.put is used to update resource at the spec path
-router.put(
-    "/:id",
-    validateCampground,
-    isLoggedIn,
-    isAuthor,
-    catchAsync(campgroundController.updateCampground)
-);
-
-router.delete(
-    "/:id",
-    isLoggedIn,
-    isAuthor,
-    catchAsync(campgroundController.deleteCampground)
 );
 
 module.exports = router;
