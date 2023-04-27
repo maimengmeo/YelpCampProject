@@ -16,6 +16,7 @@ const ExpressError = require("./utils/ExpressError");
 
 const campgroundRoutes = require("./routes/campgroundRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
+const userRoutes = require("./routes/userRoutes");
 
 const User = require("./models/user");
 //get mongoose model setup====================================
@@ -81,6 +82,7 @@ passport.deserializeUser(User.deserializeUser());
 //order is matter=================================================================
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds", reviewRoutes);
+app.use("/", userRoutes);
 
 app.get("/", (req, res) => {
     res.render("home");
