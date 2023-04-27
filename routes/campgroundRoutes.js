@@ -6,6 +6,8 @@ const ExpressError = require("../utils/ExpressError");
 
 const Campground = require("../models/campground");
 const { campgroundSchema } = require("../errorSchemas");
+
+const { isLoggedIn } = require("../middleware");
 //middleware==================================================
 const validateCampground = (req, res, next) => {
     //get the error, loop through details array, map => array, join message with
@@ -29,7 +31,7 @@ router.get(
 );
 
 //go to create campground page
-router.get("/new", (req, res) => {
+router.get("/new", isLoggedIn, (req, res) => {
     res.render("campgrounds/new");
 });
 
@@ -37,6 +39,7 @@ router.get("/new", (req, res) => {
 router.post(
     "/",
     validateCampground,
+    isLoggedIn,
     catchAsync(async (req, res, next) => {
         req.flash("success", "Successfully add a new campground!");
 
@@ -69,6 +72,7 @@ router.get(
 //go to edit page
 router.get(
     "/:id/edit",
+    isLoggedIn,
     catchAsync(async (req, res) => {
         const campground = await Campground.findById(req.params.id);
 
@@ -87,6 +91,7 @@ router.get(
 router.put(
     "/:id",
     validateCampground,
+    isLoggedIn,
     catchAsync(async (req, res) => {
         //obj destructuring, extract id
         const { id } = req.params;
@@ -103,6 +108,7 @@ router.put(
 
 router.delete(
     "/:id",
+    isLoggedIn,
     catchAsync(async (req, res) => {
         const { id } = req.params;
         await Campground.findByIdAndDelete(id);
