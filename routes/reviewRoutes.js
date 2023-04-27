@@ -2,22 +2,11 @@ const express = require("express");
 const router = express.Router();
 
 const catchAsync = require("../utils/catchAsync");
-const ExpressError = require("../utils/ExpressError");
 
-const { reviewSchema } = require("../errorSchemas");
 const Review = require("../models/review");
 const Campground = require("../models/campground");
 
-//middleware================================================
-const validateReview = (req, res, next) => {
-    const { error } = reviewSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(msg, 400);
-    } else {
-        next(); //is no error, go to post/ put function
-    }
-};
+const { validateReview } = require("../middleware");
 
 //paths=====================================================
 router.post("/:id/reviews", validateReview, async (req, res) => {

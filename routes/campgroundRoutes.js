@@ -2,23 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const catchAsync = require("../utils/catchAsync");
-const ExpressError = require("../utils/ExpressError");
-
 const Campground = require("../models/campground");
-const { campgroundSchema } = require("../errorSchemas");
 
-const { isLoggedIn } = require("../middleware");
-//middleware==================================================
-const validateCampground = (req, res, next) => {
-    //get the error, loop through details array, map => array, join message with
-    const { error } = campgroundSchema.validate(req.body);
-    if (error) {
-        const msg = error.details.map((el) => el.message).join(",");
-        throw new ExpressError(msg, 400);
-    } else {
-        next(); //is no error, go to post/ put function
-    }
-};
+const { isLoggedIn, isAuthor, validateCampground } = require("../middleware");
 
 //path - order is matter========================================
 //display all campgrounds
@@ -73,6 +59,7 @@ router.get(
 router.get(
     "/:id/edit",
     isLoggedIn,
+    isAuthor,
     catchAsync(async (req, res) => {
         const { id } = req.params;
         const campground = await Campground.findById(id);
@@ -80,11 +67,6 @@ router.get(
         if (!campground) {
             req.flash("error", "Cannot find that campground");
             return res.redirect("/campgrounds");
-        }
-
-        if (!campground.author.equals(req.user._id)) {
-            req.flash("error", "You do not have permission ot do that");
-            return res.redirect(`/campgrounds/${id}`);
         }
 
         res.render("campgrounds/edit", { campground });
@@ -98,15 +80,12 @@ router.put(
     "/:id",
     validateCampground,
     isLoggedIn,
+    isAuthor,
     catchAsync(async (req, res) => {
         //obj destructuring, extract id
         const { id } = req.params;
-        const campground = await Campground.findById(id);
-        if (!campground.author.equals(req.user._id)) {
-            req.flash("error", "You do not have permission ot do that");
-            return res.redirect(`/campgrounds/${id}`);
-        }
-        const camp = await Campground.findByIdAndUpdate(id, {
+
+        const campground = await Campground.findByIdAndUpdate(id, {
             ...req.body.campground,
             //need to use spread obj here bc this method takes an obj w new data
             //need to spread the obj into obj literal to create new obj
@@ -120,6 +99,7 @@ router.put(
 router.delete(
     "/:id",
     isLoggedIn,
+    isAuthor,
     catchAsync(async (req, res) => {
         const { id } = req.params;
         await Campground.findByIdAndDelete(id);
