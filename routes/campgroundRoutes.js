@@ -74,11 +74,17 @@ router.get(
     "/:id/edit",
     isLoggedIn,
     catchAsync(async (req, res) => {
-        const campground = await Campground.findById(req.params.id);
+        const { id } = req.params;
+        const campground = await Campground.findById(id);
 
         if (!campground) {
             req.flash("error", "Cannot find that campground");
             return res.redirect("/campgrounds");
+        }
+
+        if (!campground.author.equals(req.user._id)) {
+            req.flash("error", "You do not have permission ot do that");
+            return res.redirect(`/campgrounds/${id}`);
         }
 
         res.render("campgrounds/edit", { campground });
@@ -95,7 +101,12 @@ router.put(
     catchAsync(async (req, res) => {
         //obj destructuring, extract id
         const { id } = req.params;
-        const campground = await Campground.findByIdAndUpdate(id, {
+        const campground = await Campground.findById(id);
+        if (!campground.author.equals(req.user._id)) {
+            req.flash("error", "You do not have permission ot do that");
+            return res.redirect(`/campgrounds/${id}`);
+        }
+        const camp = await Campground.findByIdAndUpdate(id, {
             ...req.body.campground,
             //need to use spread obj here bc this method takes an obj w new data
             //need to spread the obj into obj literal to create new obj
