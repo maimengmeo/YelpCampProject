@@ -14,6 +14,9 @@
             <!-- info -->
             <ul class="list-group list-group-flush">
                 <li class="list-group-item"><%=campground.location%></li>
+                <li class="list-group-item">
+                    Owner: <%=campground.author.username%>
+                </li>
                 <li class="list-group-item">$<%=campground.price%>/night</li>
             </ul>
 
