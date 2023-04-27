@@ -4,7 +4,7 @@ const User = require("../models/user");
 const catchAsync = require("../utils/catchAsync");
 const passport = require("passport");
 const { render } = require("ejs");
-const { storeReturnTo } = require("../middleware");
+const { storeReturnTo, isLoggedIn } = require("../middleware");
 
 router.get("/register", (req, res) => {
     res.render("users/register");
@@ -46,6 +46,7 @@ router.post(
     }),
     (req, res) => {
         req.flash("success", "Welcome back!");
+        console.log("returnTo:", res.locals.returnTo);
         const redirectUrl = res.locals.returnTo || "/campgrounds"; // redirect user to the previous page
         res.redirect(redirectUrl);
     }

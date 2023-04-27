@@ -4,7 +4,12 @@ const router = express.Router();
 const catchAsync = require("../utils/catchAsync");
 const Campground = require("../models/campground");
 
-const { isLoggedIn, isAuthor, validateCampground } = require("../middleware");
+const {
+    isLoggedIn,
+    isAuthor,
+    validateCampground,
+    storeReturnTo,
+} = require("../middleware");
 
 //path - order is matter========================================
 //display all campgrounds
@@ -40,15 +45,21 @@ router.post(
 //go to selected campground page
 router.get(
     "/:id",
+    storeReturnTo,
     catchAsync(async (req, res) => {
         const campground = await Campground.findById(req.params.id)
-            .populate("reviews")
+            .populate({
+                path: "reviews",
+                populate: { path: "author" },
+            })
             .populate("author");
 
         if (!campground) {
             req.flash("error", "Cannot find that campground");
             return res.redirect("/campgrounds");
         }
+
+        req.session.returnTo = req.originalUrl;
         res.render("campgrounds/show", { campground });
 
         //get the id from index.ejs, find campground by id, put it to show.ejs

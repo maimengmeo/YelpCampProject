@@ -6,7 +6,7 @@ const catchAsync = require("../utils/catchAsync");
 const Review = require("../models/review");
 const Campground = require("../models/campground");
 
-const { validateReview, isLoggedIn, isAuthor } = require("../middleware");
+const { validateReview, isLoggedIn, isReviewAuthor } = require("../middleware");
 
 //paths=====================================================
 router.post("/:id/reviews", isLoggedIn, validateReview, async (req, res) => {
@@ -24,7 +24,8 @@ router.post("/:id/reviews", isLoggedIn, validateReview, async (req, res) => {
 
 router.delete(
     "/:id/reviews/:reviewId",
-    isAuthor,
+    isLoggedIn,
+    isReviewAuthor,
     catchAsync(async (req, res) => {
         const { id, reviewId } = req.params;
 

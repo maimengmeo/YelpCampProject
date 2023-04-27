@@ -1,4 +1,5 @@
 const Campground = require("./models/campground");
+const Review = require("./models/review");
 
 const { campgroundSchema, reviewSchema } = require("./errorSchemas");
 
@@ -6,8 +7,10 @@ const ExpressError = require("./utils/ExpressError");
 
 module.exports.isLoggedIn = (req, res, next) => {
     if (!req.isAuthenticated()) {
+        console.log("isLoggedin");
         req.flash("error", "you must be sign in");
         req.session.returnTo = req.originalUrl;
+
         return res.redirect("/login");
         //have to return bc if not, the code will keep running
     }
@@ -38,6 +41,17 @@ module.exports.isAuthor = async (req, res, next) => {
     if (!campground.author.equals(req.user._id)) {
         req.flash("error", "You do not have permission ot do that");
         return res.redirect(`/campgrounds/${id}`);
+    }
+
+    next();
+};
+
+module.exports.isReviewAuthor = async (req, res, next) => {
+    const { campId, reviewId } = req.params;
+    const review = await Review.findById(reviewId);
+    if (!review.author.equals(req.user._id)) {
+        req.flash("error", "You do not have permission ot do that");
+        return res.redirect(`/campgrounds/${campId}`);
     }
 
     next();
