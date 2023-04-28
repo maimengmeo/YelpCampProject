@@ -18,15 +18,13 @@ const upload = multer({ storage });
 router
     .route("/")
     .get(catchAsync(campgroundController.index)) //display all campgrounds
-    // .post(
-    //     //create campground
-    //     isLoggedIn,
-    //     validateCampground,
-    //     catchAsync(campgroundController.createCampground)
-    // );
-    .post(upload.array("image"), (req, res) => {
-        console.log(req.body, req.files);
-    });
+    .post(
+        //create campground
+        isLoggedIn,
+        upload.array("image"),
+        validateCampground,
+        catchAsync(campgroundController.createCampground)
+    );
 
 //go to create campground page
 router.get("/new", isLoggedIn, campgroundController.newCampgroundForm);
