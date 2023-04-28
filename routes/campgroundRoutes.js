@@ -36,7 +36,7 @@ router
         //app.put is used to update resource at the spec path
         isLoggedIn,
         isAuthor,
-        upload.array("image"),
+        upload.array("image"), //have to upload image before able to validate campground
         validateCampground,
         catchAsync(campgroundController.updateCampground)
     )
