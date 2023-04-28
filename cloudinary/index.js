@@ -1,7 +1,7 @@
 const cloudinary = require("cloudinary").v2;
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 const express = require("express");
-const multer = require("/multer"); //handling multipart,file uploads
+const multer = require("multer"); //handling multipart,file uploads
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
