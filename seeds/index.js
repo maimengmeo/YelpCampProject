@@ -39,7 +39,28 @@ const seedDB = async () => {
             author: "6449c0eb98d4d4bea7cc5291",
             location: `${cities[rand1000].city}, ${cities[rand1000].state}`,
             title: `${sample(descriptors)} ${sample(places)}`,
-            image: "https://source.unsplash.com/collection/483251",
+            images: [
+                {
+                    url: "https://res.cloudinary.com/donxgudgk/image/upload/v1682696787/YelpCamp/vat5hk08twtbumvokk4g.jpg",
+                    filename: "YelpCamp/vat5hk08twtbumvokk4g",
+                },
+                {
+                    url: "https://res.cloudinary.com/donxgudgk/image/upload/v1682696790/YelpCamp/rr5bxk5no2q63ia3lznr.jpg",
+                    filename: "YelpCamp/rr5bxk5no2q63ia3lznr",
+                },
+                {
+                    url: "https://res.cloudinary.com/donxgudgk/image/upload/v1682696792/YelpCamp/fmfmp40rclefbt98oh2f.jpg",
+                    filename: "YelpCamp/fmfmp40rclefbt98oh2f",
+                },
+                {
+                    url: "https://res.cloudinary.com/donxgudgk/image/upload/v1682696798/YelpCamp/utdxien5ltqvhqczuhau.jpg",
+                    filename: "YelpCamp/utdxien5ltqvhqczuhau",
+                },
+                {
+                    url: "https://res.cloudinary.com/donxgudgk/image/upload/v1682696800/YelpCamp/o0ljksfpk9mn48thy2ax.jpg",
+                    filename: "YelpCamp/o0ljksfpk9mn48thy2ax",
+                },
+            ],
             description:
                 "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quo magni, sapiente voluptas commodi incidunt voluptatem veritatis harum voluptates facere maxime eius vero dolor atque fuga laudantium omnis minima consequatur mollitia.",
             price,
