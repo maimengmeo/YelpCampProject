@@ -10,17 +10,22 @@ const {
     storeReturnTo,
 } = require("../middleware");
 
+const multer = require("multer");
+const upload = multer({ dest: "uploads/" });
 //path - order is matter========================================
 
 router
     .route("/")
     .get(catchAsync(campgroundController.index)) //display all campgrounds
-    .post(
-        //create campground
-        validateCampground,
-        isLoggedIn,
-        catchAsync(campgroundController.createCampground)
-    );
+    // .post(
+    //     //create campground
+    //     isLoggedIn,
+    //     validateCampground,
+    //     catchAsync(campgroundController.createCampground)
+    // );
+    .post(upload.array("image"), (req, res) => {
+        console.log(req.body, req.files);
+    });
 
 //go to create campground page
 router.get("/new", isLoggedIn, campgroundController.newCampgroundForm);
