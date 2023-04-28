@@ -69,6 +69,15 @@ module.exports.updateCampground = async (req, res) => {
         //need to spread the obj into obj literal to create new obj
         //that contain all original properties along w new data submitted
     });
+    const images = req.files.map((f) => ({
+        url: f.path,
+        filename: f.filename,
+    }));
+    campground.images.push(...images);
+
+    await campground.save();
+    console.log("CAMPGROUND" + campground);
+
     req.flash("success", "Successfully updated campground");
     res.redirect(`/campgrounds/${campground._id}`);
 };

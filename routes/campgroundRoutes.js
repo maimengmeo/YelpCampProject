@@ -34,9 +34,10 @@ router
     .get(storeReturnTo, catchAsync(campgroundController.showCampground)) //go to selected campground page
     .put(
         //app.put is used to update resource at the spec path
-        validateCampground,
         isLoggedIn,
         isAuthor,
+        upload.array("image"),
+        validateCampground,
         catchAsync(campgroundController.updateCampground)
     )
     .delete(
