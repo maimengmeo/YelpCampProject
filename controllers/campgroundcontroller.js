@@ -1,6 +1,10 @@
 const Campground = require("../models/campground");
 const { cloudinary } = require("../cloudinary");
 
+const mbxGeoCoding = require("@mapbox/mapbox-sdk/services/geocoding");
+const mapBoxToken = process.env.MAPBOX_TOKEN;
+const geoCoder = mbxGeoCoding({ accessToken: mapBoxToken });
+
 module.exports.index = async (req, res) => {
     const campgrounds = await Campground.find({});
     res.render("campgrounds/index", { campgrounds });
@@ -13,18 +17,28 @@ module.exports.newCampgroundForm = (req, res) => {
 module.exports.createCampground = async (req, res, next) => {
     //if (!req.body.campground) throw new ExpressError("Invalid Campground Data", 400);
 
-    const campground = new Campground(req.body.campground); //create new campground from req.body
-    campground.images = req.files.map((f) => ({
-        url: f.path,
-        filename: f.filename,
-    }));
-    campground.author = req.user._id;
-    await campground.save();
+    //this method is used to convert location search string into
+    //corresponding geographic coordinates (lat & long)
+    const geoData = await geoCoder
+        .forwardGeocode({
+            query: req.body.campground.location,
+            limit: 1,
+        })
+        .send(); //forward() returns req obj, send() actually send req & retrieve data
+    console.log(geoData.body.features[0].geometry.coordinates);
 
-    console.log(campground);
+    // const campground = new Campground(req.body.campground); //create new campground from req.body
+    // campground.images = req.files.map((f) => ({
+    //     url: f.path,
+    //     filename: f.filename,
+    // }));
+    // campground.author = req.user._id;
+    // await campground.save();
 
-    req.flash("success", "Successfully add a new campground!");
-    res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
+    // console.log(campground);
+
+    // req.flash("success", "Successfully add a new campground!");
+    // res.redirect(`/campgrounds/${campground._id}`); //redirect to the new campground page after created
 };
 
 module.exports.showCampground = async (req, res) => {
