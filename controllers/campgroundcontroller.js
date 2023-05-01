@@ -26,6 +26,8 @@ module.exports.createCampground = async (req, res, next) => {
         })
         .send(); //forward() returns req obj, send() actually send req & retrieve data
 
+    // create new campground with data from html form,
+    //add images, owner/creater, geometry
     const campground = new Campground(req.body.campground); //create new campground from req.body
     campground.images = req.files.map((f) => ({
         url: f.path,
