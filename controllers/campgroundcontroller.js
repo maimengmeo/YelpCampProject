@@ -1,4 +1,5 @@
 const Campground = require("../models/campground");
+const { cloudinary } = require("../cloudinary");
 
 module.exports.index = async (req, res) => {
     const campgrounds = await Campground.find({});
@@ -62,7 +63,6 @@ module.exports.editCampgroundForm = async (req, res) => {
 module.exports.updateCampground = async (req, res) => {
     //obj destructuring, extract id
     const { id } = req.params;
-    console.log(req.body);
     const campground = await Campground.findByIdAndUpdate(id, {
         ...req.body.campground,
         //need to use spread obj here bc this method takes an obj w new data
@@ -73,9 +73,23 @@ module.exports.updateCampground = async (req, res) => {
         url: f.path,
         filename: f.filename,
     }));
+    //add more image
     campground.images.push(...images);
 
     await campground.save();
+
+    console.log(cloudinary);
+    //delete image
+    if (req.body.deleteImages) {
+        console.log(req.body.deleteImages);
+
+        for (let filename of req.body.deleteImages) {
+            await cloudinary.uploader.destroy(filename);
+        }
+        await campground.updateOne({
+            $pull: { images: { filename: { $in: req.body.deleteImages } } },
+        });
+    }
 
     req.flash("success", "Successfully updated campground");
     res.redirect(`/campgrounds/${campground._id}`);
