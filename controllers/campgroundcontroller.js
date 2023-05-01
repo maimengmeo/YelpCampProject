@@ -62,7 +62,7 @@ module.exports.editCampgroundForm = async (req, res) => {
 module.exports.updateCampground = async (req, res) => {
     //obj destructuring, extract id
     const { id } = req.params;
-
+    console.log(req.body);
     const campground = await Campground.findByIdAndUpdate(id, {
         ...req.body.campground,
         //need to use spread obj here bc this method takes an obj w new data
@@ -76,7 +76,6 @@ module.exports.updateCampground = async (req, res) => {
     campground.images.push(...images);
 
     await campground.save();
-    console.log("CAMPGROUND" + campground);
 
     req.flash("success", "Successfully updated campground");
     res.redirect(`/campgrounds/${campground._id}`);
