@@ -1,6 +1,8 @@
 <%layout('layouts/boilerplate')%>
 <!-- ejsMate -->
 
+<div id="map" style="width: 100%; height: 500px"></div>
+
 <h1>All Campgrounds</h1>
 
 <% for(let campground of campgrounds) {%>
@@ -35,3 +37,8 @@
     </div>
 </div>
 <% } %>
+
+<script>
+    const mapToken = "<%-process.env.MAPBOX_TOKEN%>";
+</script>
+<script src="/scripts/clusterMap.js"></script>
