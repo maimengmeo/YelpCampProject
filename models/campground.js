@@ -10,34 +10,48 @@ ImageSchema.virtual("thumbnail").get(function () {
     return this.url.replace("/upload", "/upload/w_200");
 }); //for thumbnail size
 
-const CampgroundSchema = new Schema({
-    title: String,
-    price: Number,
-    description: String,
-    location: String,
-    geometry: {
-        //GeoJSON point
-        type: {
-            type: String,
-            enum: ["Point"],
-            required: true,
+const opts = { toJSON: { virtuals: true } };
+const CampgroundSchema = new Schema(
+    {
+        title: String,
+        price: Number,
+        description: String,
+        location: String,
+        geometry: {
+            //GeoJSON point
+            type: {
+                type: String,
+                enum: ["Point"],
+                required: true,
+            },
+            coordinates: {
+                type: [Number],
+                required: true,
+            },
         },
-        coordinates: {
-            type: [Number],
-            required: true,
-        },
-    },
-    images: [ImageSchema],
-    author: {
-        type: Schema.Types.ObjectId,
-        ref: "User",
-    },
-    reviews: [
-        {
+        images: [ImageSchema],
+        author: {
             type: Schema.Types.ObjectId,
-            ref: "Review",
+            ref: "User",
         },
-    ],
+        reviews: [
+            {
+                type: Schema.Types.ObjectId,
+                ref: "Review",
+            },
+        ],
+    },
+    opts
+);
+
+CampgroundSchema.virtual("properties.popUpMarkup").get(function () {
+    return `
+    <a href="/campgrounds/${this._id}">
+    <strong>${this.title}</strong>
+    </a>
+    <p>${this.location}</p>
+    <p>$${this.price}/ night</p>
+    `;
 });
 
 //query middleware
