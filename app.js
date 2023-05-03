@@ -23,6 +23,8 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const userRoutes = require("./routes/userRoutes");
 
 const User = require("./models/user");
+
+const mongoSanitize = require("express-mongo-sanitize");
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
@@ -56,6 +58,8 @@ app.use(override("_method"));
 
 app.use(express.static(path.join(__dirname, "public")));
 
+app.use(mongoSanitize({ replaceWith: "_" }));
+
 const sessionConfig = {
     secret: "thisshouldbeabettersecret",
     resave: false,
@@ -83,6 +87,7 @@ app.use((req, res, next) => {
     res.locals.error = req.flash("error");
     next();
 });
+
 //order is matter=================================================================
 app.use("/campgrounds", campgroundRoutes);
 app.use("/campgrounds", reviewRoutes);
@@ -103,6 +108,7 @@ app.use((err, req, res, next) => {
     if (!err.message) err.message = "Something went wrong";
     res.status(statusCode).render("error", { err });
 });
+
 //===================================================================
 app.listen(3000, () => {
     console.log("serving on port 3000");
