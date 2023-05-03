@@ -117,3 +117,16 @@ module.exports.deleteCampground = async (req, res) => {
     req.flash("success", "Successfully deleted campground");
     res.redirect("/campgrounds");
 };
+
+module.exports.searchCampground = async (req, res) => {
+    try {
+        const { keyword } = req.query;
+        const campgrounds = await Campground.find({
+            title: { $regex: `${keyword}`, $options: "i" },
+        });
+
+        res.render("campgrounds/index", { campgrounds });
+    } catch (e) {
+        console.log(e);
+    }
+};

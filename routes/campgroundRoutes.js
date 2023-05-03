@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const campgroundController = require("../controllers/campgroundcontroller");
+const campgroundController = require("../controllers/campgroundController");
 const catchAsync = require("../utils/catchAsync");
 
 const {
@@ -28,7 +28,7 @@ router
 
 //go to create campground page
 router.get("/new", isLoggedIn, campgroundController.newCampgroundForm);
-
+router.get("/search", catchAsync(campgroundController.searchCampground));
 router
     .route("/:id")
     .get(storeReturnTo, catchAsync(campgroundController.showCampground)) //go to selected campground page
@@ -47,11 +47,9 @@ router
     );
 
 //go to edit page
-router.get(
-    "/:id/edit",
-    isLoggedIn,
-    isAuthor,
-    catchAsync(campgroundController.editCampgroundForm)
-);
+router.get("/:id/edit", isLoggedIn, isAuthor, (req, res) => {
+    console.log("hello edit");
+    return catchAsync(campgroundController.editCampgroundForm(req, res));
+});
 
 module.exports = router;

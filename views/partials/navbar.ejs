@@ -19,16 +19,20 @@
                 <a class="nav-link" href="/campgrounds/new">New Campground</a>
             </div>
             <div class="navbar-nav ms-auto">
-                <form class="d-flex search-form" role="search">
+                <form
+                    class="d-flex search-form"
+                    role="search"
+                    action="/campgrounds/search"
+                    method="GET"
+                >
                     <input
                         class="form-control me-2"
                         type="search"
                         placeholder="Search"
                         aria-label="Search"
+                        name="keyword"
                     />
-                    <button class="btn btn-outline-success" type="submit">
-                        Search
-                    </button>
+                    <button class="btn btn-outline-success">Search</button>
                 </form>
                 <%if(!currentUser){%>
                 <a class="nav-link" href="/register">Register</a>
