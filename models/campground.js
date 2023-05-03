@@ -49,8 +49,9 @@ CampgroundSchema.virtual("properties.popUpMarkup").get(function () {
     <a href="/campgrounds/${this._id}">
     <strong>${this.title}</strong>
     </a>
-    <p>${this.location}</p>
+    <p class="text-body-secondary">${this.location}</p>
     <p>$${this.price}/ night</p>
+    <img crossorigin="anonymous" src="${this.images[0].thumbnail}"/>
     `;
 });
 
