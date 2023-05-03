@@ -1,13 +1,15 @@
 <%-layout('layouts/boilerplate')%>
+<link rel="stylesheet" href="/styles/home.css" />
 
-<main>
+<main
+    class="h-100 d-flex flex-column align-items-center justify-content-center"
+>
     <h1>YelpCamp</h1>
+    <h4>Welcome to YelpCamp!</h4>
     <p class="lead">
-        Welcome to YelpCamp! <br />
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Fugit quia
-        sequi, distinctio, porro neque officiis hic quisquam aspernatur magni
-        obcaecati doloribus quaerat ab explicabo quas beatae laboriosam non
-        impedit eum!
+        Explore the great outdoors and book your next camping adventure with us!
+        Our campground website offers diverse campsites, stunning landscapes,
+        and thrilling outdoor activities for everyone to enjoy.
     </p>
     <a
         href="/campgrounds"
@@ -15,3 +17,15 @@
         >View Campgrounds</a
     >
 </main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const navbar = document.querySelector(".navbar");
+        const footer = document.querySelector(".footer");
+        console.log(footer);
+        navbar.classList.add("bg-transparent");
+        navbar.classList.remove("bg-dark");
+        footer.classList.add("bg-transparent");
+        footer.classList.remove("bg-dark");
+    });
+</script>

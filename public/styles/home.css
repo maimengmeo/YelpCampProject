@@ -1,0 +1,13 @@
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)),
+        url("https://source.unsplash.com/Nowd8MgUK8A");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+    color: white;
+    text-align: center;
+    display: flex;
+}
+main {
+    height: 100%;
+}
