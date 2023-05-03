@@ -22,10 +22,12 @@
     document.addEventListener("DOMContentLoaded", function () {
         const navbar = document.querySelector(".navbar");
         const footer = document.querySelector(".footer");
-        console.log(footer);
+        const searchForm = document.querySelector(".search-form");
+
         navbar.classList.add("bg-transparent");
         navbar.classList.remove("bg-dark");
         footer.classList.add("bg-transparent");
         footer.classList.remove("bg-dark");
+        searchForm.remove();
     });
 </script>
