@@ -28,6 +28,8 @@ const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet"); //secure Express apps by setting various HTTP headers
 
 const paginate = require("express-paginate");
+
+//const dbUrl = process.env.DB_URL;
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
