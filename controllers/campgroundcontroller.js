@@ -5,9 +5,29 @@ const mbxGeoCoding = require("@mapbox/mapbox-sdk/services/geocoding");
 const mapBoxToken = process.env.MAPBOX_TOKEN;
 const geoCoder = mbxGeoCoding({ accessToken: mapBoxToken });
 
-module.exports.index = async (req, res) => {
-    const campgrounds = await Campground.find({});
-    res.render("campgrounds/index", { campgrounds });
+const paginate = require("express-paginate");
+
+module.exports.index = async (req, res, next) => {
+    try {
+        const [results, itemCount] = await Promise.all([
+            Campground.find({}).limit(10).skip(req.skip).lean().exec(),
+            Campground.count({}),
+        ]);
+        const pageCount = Math.ceil(itemCount / 10);
+        const currentPage = req.query.page || 1;
+
+        res.render("campgrounds/index", {
+            campgrounds: results,
+            pageCount,
+            itemCount,
+            currentPage,
+            pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+        });
+    } catch (err) {
+        next(err);
+    }
+    // const campgrounds = await Campground.find({});
+    // res.render("campgrounds/index", { campgrounds });
 };
 
 module.exports.newCampgroundForm = (req, res) => {

@@ -26,6 +26,8 @@ const User = require("./models/user");
 
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet"); //secure Express apps by setting various HTTP headers
+
+const paginate = require("express-paginate");
 //get mongoose model setup====================================
 mongoose
     .connect("mongodb://127.0.0.1:27017/YelpCamp", {
@@ -62,6 +64,8 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(mongoSanitize({ replaceWith: "_" }));
 
 app.use(helmet({ contentSecurityPolicy: false }));
+
+app.use(paginate.middleware(10, 50));
 
 const sessionConfig = {
     name: "session",

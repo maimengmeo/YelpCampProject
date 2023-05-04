@@ -44,6 +44,40 @@
 </div>
 <% } %>
 
+<div class="d-flex justify-content-end">
+    <% if (currentPage > 1) { %>
+    <a class="btn btn-dark" href="/campgrounds?page=<%= currentPage - 1 %>"
+        >Previous</a
+    >
+    <% } %>
+    <div class="dropdown">
+        <a
+            class="btn btn-secondary dropdown-toggle"
+            href="#"
+            role="button"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+        >
+            Page
+        </a>
+
+        <ul class="dropdown-menu" style="max-height: 100px; overflow-y: scroll">
+            <li>
+                <% for (let i = 1; i <= pageCount; i++) { %>
+                <a class="dropdown-item" href="/campgrounds?page=<%= i %>"
+                    ><%= i %></a
+                >
+                <% } %>
+            </li>
+        </ul>
+    </div>
+    <% if (currentPage < pageCount) { %>
+    <a class="btn btn-dark" href="/campgrounds?page=<%= currentPage + 1 %>"
+        >Next</a
+    >
+    <% } %>
+</div>
+
 <script>
     const mapToken = "<%-process.env.MAPBOX_TOKEN%>";
     const campgrounds = {features: <%-JSON.stringify(campgrounds)%>};
