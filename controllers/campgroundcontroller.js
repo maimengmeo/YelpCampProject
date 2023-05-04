@@ -153,3 +153,9 @@ module.exports.searchCampground = async (req, res) => {
         console.log(e);
     }
 };
+
+module.exports.bookCampground = async (req, res) => {
+    // try {
+    //     const {checkin, checkout} = req.body;
+    // }
+};
