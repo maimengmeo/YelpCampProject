@@ -29,10 +29,12 @@ const helmet = require("helmet"); //secure Express apps by setting various HTTP 
 
 const paginate = require("express-paginate");
 
-//const dbUrl = process.env.DB_URL;
+const dbUrl = process.env.DB_URL || "mongodb://127.0.0.1:27017/YelpCamp";
+
+const MongoDBStore = require("connect-mongo"); //to store session in mongo
 //get mongoose model setup====================================
 mongoose
-    .connect("mongodb://127.0.0.1:27017/YelpCamp", {
+    .connect(dbUrl, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
     })
@@ -69,9 +71,19 @@ app.use(helmet({ contentSecurityPolicy: false }));
 
 app.use(paginate.middleware(10, 50));
 
+const secret = process.env.SECRET || "thisshouldbeabettersecret";
+const store = MongoDBStore.create({
+    mongoUrl: dbUrl,
+    crypto: { secret: secret },
+    touchAfter: 24 * 60 * 60, //has to be in second
+});
+store.on("error", function (e) {
+    console.log("SESSION STORE ERROR", e);
+});
+
 const sessionConfig = {
     name: "session",
-    secret: "thisshouldbeabettersecret",
+    secret,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -120,6 +132,7 @@ app.use((err, req, res, next) => {
 });
 
 //===================================================================
-app.listen(3000, () => {
-    console.log("serving on port 3000");
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`serving on port 3000 ${port}`);
 });
