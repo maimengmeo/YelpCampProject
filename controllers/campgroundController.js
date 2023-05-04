@@ -143,14 +143,31 @@ module.exports.deleteCampground = async (req, res) => {
 
 module.exports.searchCampground = async (req, res) => {
     try {
-        const { keyword } = req.query;
-        const campgrounds = await Campground.find({
-            title: { $regex: `${keyword}`, $options: "i" },
-        });
+        const allCampgrounds = await Campground.find({});
 
-        res.render("campgrounds/index", { campgrounds });
-    } catch (e) {
-        console.log(e);
+        const { keyword } = req.query;
+
+        const [results, itemCount] = await Promise.all([
+            Campground.find({ title: { $regex: `${keyword}`, $options: "i" } })
+                .limit(10)
+                .skip(req.skip)
+                .lean()
+                .exec(),
+            Campground.count({}),
+        ]);
+        const pageCount = Math.ceil(itemCount / 10);
+        const currentPage = req.query.page || 1;
+        console.log(results);
+        res.render("campgrounds/index", {
+            campgrounds: results,
+            allCampgrounds,
+            pageCount,
+            itemCount,
+            currentPage,
+            pages: paginate.getArrayPages(req)(3, pageCount, req.query.page),
+        });
+    } catch (err) {
+        next(err);
     }
 };
 
