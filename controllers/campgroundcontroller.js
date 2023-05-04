@@ -9,6 +9,8 @@ const paginate = require("express-paginate");
 
 module.exports.index = async (req, res, next) => {
     try {
+        const allCampgrounds = await Campground.find({});
+
         const [results, itemCount] = await Promise.all([
             Campground.find({}).limit(10).skip(req.skip).lean().exec(),
             Campground.count({}),
@@ -18,6 +20,7 @@ module.exports.index = async (req, res, next) => {
 
         res.render("campgrounds/index", {
             campgrounds: results,
+            allCampgrounds,
             pageCount,
             itemCount,
             currentPage,
@@ -26,7 +29,7 @@ module.exports.index = async (req, res, next) => {
     } catch (err) {
         next(err);
     }
-    // const campgrounds = await Campground.find({});
+
     // res.render("campgrounds/index", { campgrounds });
 };
 
